@@ -1,0 +1,324 @@
+:root {
+	color-scheme: dark;
+	background: #08090b;
+	--grain-texture: none;
+}
+
+* {
+	box-sizing: border-box;
+}
+
+html,
+body {
+	width: 100%;
+	height: 100%;
+	margin: 0;
+	overflow: hidden;
+	background: #08090b;
+}
+
+body {
+	min-width: 280px;
+	min-height: 320px;
+}
+
+.scene,
+#particle-canvas,
+.vignette,
+.grain {
+	position: fixed;
+	inset: 0;
+	width: 100%;
+	height: 100%;
+}
+
+.scene {
+	isolation: isolate;
+	overflow: hidden;
+	background:
+		radial-gradient(ellipse at 50% 46%, #131416 0%, #0b0c0e 46%, #070809 100%);
+}
+
+#photograph {
+	position: absolute;
+	object-fit: contain;
+	opacity: 0;
+	z-index: 0;
+	transform-origin: center;
+	will-change: transform;
+	transition: opacity 2800ms ease-in-out, transform 1500ms cubic-bezier(0.22, 0.78, 0.22, 1);
+}
+
+#particle-canvas {
+	display: block;
+	z-index: 1;
+	transition: opacity 2800ms ease-in-out, filter 2800ms ease-in-out;
+}
+
+.scene[data-phase="photo-reveal"] #photograph,
+.scene[data-phase="composition"] #photograph,
+.scene[data-phase="shayari"] #photograph {
+	opacity: 1;
+}
+
+.scene[data-phase="photo-reveal"] #particle-canvas,
+.scene[data-phase="composition"] #particle-canvas,
+.scene[data-phase="shayari"] #particle-canvas {
+	opacity: 0;
+	filter: blur(1.2px);
+}
+
+.scene[data-phase="composition"] #photograph,
+.scene[data-phase="shayari"] #photograph {
+	transform: translate3d(-18vw, 0, 0) scale(min(0.69, calc(1120px / min(84vw, 192.528vh))));
+}
+
+.poetry {
+	position: fixed;
+	left: 63%;
+	top: 50%;
+	width: 37%;
+	max-width: 720px;
+	padding: 34px 38px 30px;
+	transform: translateY(-50%);
+	z-index: 4;
+	color: #e9e2d7;
+	font-family: "Noto Serif", "Noto Serif Devanagari", "Nirmala UI", Georgia, serif;
+	font-size: 24px;
+	line-height: 1.72;
+	letter-spacing: 0;
+	background: rgb(22 20 18 / 42%);
+	border: 1px solid rgb(235 226 211 / 11%);
+	border-radius: 4px;
+	box-shadow: 0 20px 54px rgb(0 0 0 / 24%);
+	opacity: 0;
+	visibility: hidden;
+	transition: opacity 850ms ease, left 900ms ease, top 900ms ease, width 900ms ease, transform 900ms ease;
+}
+
+.scene[data-phase="shayari"] .poetry {
+	opacity: 1;
+	visibility: visible;
+}
+
+.poem-stanza {
+	margin: 0 0 0.88em;
+}
+
+.poem-stanza:last-child {
+	margin-bottom: 0;
+}
+
+.letter-greeting {
+	margin: 0 0 20px;
+	color: rgb(233 226 215 / 70%);
+	font-size: 0.72em;
+	font-style: italic;
+	line-height: 1.4;
+	opacity: 0;
+	filter: blur(7px);
+	transform: translateY(7px);
+}
+
+.scene[data-phase="shayari"] .letter-greeting {
+	animation: letter-opening 900ms cubic-bezier(0.22, 0.78, 0.22, 1) 900ms both;
+}
+
+.letter-closing {
+	display: flex;
+	flex-direction: column;
+	align-items: flex-start;
+	gap: 2px;
+	margin-top: 1.12em;
+	color: rgb(233 226 215 / 70%);
+	font-size: 0.72em;
+	line-height: 1.45;
+}
+
+.letter-signoff,
+.letter-name {
+	display: block;
+	opacity: 0;
+	filter: blur(6px);
+	transform: translateY(6px);
+}
+
+.scene[data-phase="shayari"] .letter-signoff {
+	animation: letter-signoff 850ms cubic-bezier(0.22, 0.78, 0.22, 1) both;
+	animation-delay: var(--letter-signoff-delay);
+}
+
+.letter-name {
+	color: #eee7dc;
+	font-size: 1.08em;
+}
+
+.scene[data-phase="shayari"] .letter-name {
+	animation: letter-signature 900ms cubic-bezier(0.22, 0.78, 0.22, 1) both;
+	animation-delay: var(--letter-signature-delay);
+}
+
+.poem-line {
+	display: block;
+}
+
+.poem-line--climax {
+	margin-top: 0.38em;
+	color: #fff4e5;
+	font-size: 1.13em;
+}
+
+.poem-word {
+	display: inline-block;
+	opacity: 0;
+	filter: blur(8px);
+	transform: translateY(8px);
+}
+
+.scene[data-phase="shayari"] .poem-word {
+	animation: shayari-word var(--word-duration, 760ms) cubic-bezier(0.2, 0.72, 0.18, 1) both;
+	animation-delay: calc(var(--word-delay, 0ms) + var(--poem-start-delay, 2600ms));
+}
+
+@keyframes shayari-word {
+	to {
+		opacity: 1;
+		filter: blur(0);
+		transform: translateY(0);
+	}
+}
+
+@keyframes letter-opening {
+	to {
+		opacity: 1;
+		filter: blur(0);
+		transform: translateY(0);
+	}
+}
+
+@keyframes letter-signoff {
+	to {
+		opacity: 1;
+		filter: blur(0);
+		transform: translateY(0);
+	}
+}
+
+@keyframes letter-signature {
+	to {
+		opacity: 0.82;
+		filter: blur(0);
+		transform: translateY(0);
+	}
+}
+
+.vignette {
+	z-index: 2;
+	pointer-events: none;
+	background: radial-gradient(ellipse at center, transparent 42%, rgb(0 0 0 / 42%) 100%);
+}
+
+.grain {
+	z-index: 3;
+	pointer-events: none;
+	opacity: 0.085;
+	background-image: var(--grain-texture);
+	background-repeat: repeat;
+	mix-blend-mode: screen;
+}
+
+@media (prefers-reduced-motion: reduce) {
+	#photograph,
+	#particle-canvas {
+		transition-duration: 900ms;
+	}
+	.poetry {
+		transition-duration: 600ms;
+	}
+	.scene[data-phase="shayari"] .poem-word {
+		animation-duration: 500ms;
+	}
+
+	.grain {
+		opacity: 0.045;
+	}
+}
+
+@media (min-width: 768px) and (max-width: 1199px) {
+	.scene[data-phase="composition"] #photograph,
+	.scene[data-phase="shayari"] #photograph {
+		transform: translate3d(-21vw, 0, 0) scale(0.62);
+	}
+
+	.poetry {
+		left: 60%;
+		width: 37%;
+		padding: 28px 30px 26px;
+		font-size: 17px;
+	}
+}
+
+@media (min-width: 2000px) {
+	.scene[data-phase="composition"] #photograph,
+	.scene[data-phase="shayari"] #photograph {
+		transform: translate3d(-360px, 0, 0) scale(min(0.69, calc(1120px / min(84vw, 192.528vh))));
+	}
+
+	.poetry {
+		left: calc(50% + 280px);
+		width: min(37vw, 720px);
+	}
+}
+
+@media (max-width: 767px) {
+	html,
+	body {
+		height: auto;
+		min-height: 100%;
+		overflow-x: hidden;
+		overflow-y: auto;
+	}
+
+	.scene[data-phase="composition"],
+	.scene[data-phase="shayari"] {
+		position: absolute;
+		inset: 0 0 auto;
+		height: auto;
+		min-height: 100vh;
+		overflow: visible;
+		padding: 0 5vw 42px;
+	}
+
+	.scene[data-phase="composition"]::before,
+	.scene[data-phase="shayari"]::before {
+		display: block;
+		height: calc(60px + 37.4vw);
+		content: "";
+	}
+
+	.scene[data-phase="composition"] #photograph,
+	.scene[data-phase="shayari"] #photograph {
+		transform: translate3d(0, calc(-50vh + 50% + 24px), 0) scale(1.07143);
+	}
+
+	.poetry {
+		position: relative;
+		left: auto;
+		top: auto;
+		width: 90vw;
+		max-width: 680px;
+		margin: 0 auto;
+		padding: 25px 23px 28px;
+		transform: none;
+		font-size: 18px;
+		line-height: 1.58;
+	}
+
+	.letter-greeting {
+		margin-bottom: 17px;
+	}
+
+	.poem-stanza {
+		margin-bottom: 0.78em;
+	}
+}
